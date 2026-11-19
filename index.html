@@ -2336,3 +2336,44 @@ KAART.kand.forEach(k=>{const g=el('g',{class:'kd',tabindex:0,role:'button','aria
 [['f-tp',gt],['f-md',gm],['f-lu',gl],['f-kd',gk]].forEach(([id,g])=>document.getElementById(id).addEventListener('change',e=>{g.style.display=e.target.checked?'':'none'}));
 })();
 </script>
+
+<!-- Kommentaarid teemade kaupa (19.11 Ivar). Saadab meili ivar@kontamo.ee, teema "[Raba aruanne] <teema>". Claude loeb: andmed/loe-kommentaarid.ps1 -->
+<style>
+.km-btn{display:inline-flex;align-items:center;gap:5px;margin-left:10px;vertical-align:middle;border:1px solid #C2410C;background:#fff7ed;color:#9a3412;border-radius:999px;padding:4px 11px;font:600 12px/1.2 Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.km-btn:hover{background:#C2410C;color:#fff}
+.km-ov{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.km-ov[hidden]{display:none}
+.km-box{background:#fff;color:#1c1917;border-radius:12px;max-width:520px;width:100%;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.35);font:15px/1.45 Inter,system-ui,sans-serif}
+.km-box h4{margin:0 0 4px;font-size:17px}
+.km-box .km-t{color:#9a3412;font-weight:600;margin-bottom:12px}
+.km-box label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+.km-box input,.km-box textarea{width:100%;box-sizing:border-box;border:1px solid #d6d3d1;border-radius:8px;padding:9px 10px;font:15px Inter,system-ui,sans-serif}
+.km-box textarea{min-height:130px;resize:vertical}
+.km-row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.km-row button{border:0;border-radius:8px;padding:10px 16px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer}
+.km-ok{background:#C2410C;color:#fff}.km-no{background:#e7e5e4;color:#1c1917}
+.km-info{font-size:12px;color:#78716c;margin-top:10px}
+@media (prefers-color-scheme:dark){.km-box{background:#1c1917;color:#f5f5f4}.km-box input,.km-box textarea{background:#292524;color:#f5f5f4;border-color:#57534e}.km-no{background:#44403c;color:#f5f5f4}.km-btn{background:#431407;color:#fed7aa}}
+</style>
+<script>
+(function(){
+ const TO='ivar@kontamo.ee',PRE='[Raba aruanne] ';let ov,teema='',ankur='';
+ function puhas(el){const c=el.cloneNode(true);c.querySelectorAll('.km-btn,.et-zbtn').forEach(n=>n.remove());return c.textContent.replace(/\s+/g,' ').trim().slice(0,90)}
+ function build(){ov=document.createElement('div');ov.className='km-ov';ov.hidden=true;
+  ov.innerHTML='<div class="km-box" role="dialog" aria-label="Kommentaar"><h4>💬 Kommentaar</h4><div class="km-t"></div><label for="km-n">Sinu ees- ja perenimi (kohustuslik)</label><input id="km-n" autocomplete="name" required><label for="km-k">Kommentaar, parandus või küsimus</label><textarea id="km-k"></textarea><div class="km-row"><button class="km-no" type="button">Tühista</button><button class="km-ok" type="button">Saada kommentaar</button></div><div class="km-info">Avaneb sinu meiliprogramm valmis kirjaga aadressile '+TO+' – vajuta seal „Saada".</div></div>';
+  document.body.append(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov||e.target.closest('.km-no'))ov.hidden=true});
+  ov.querySelector('.km-ok').addEventListener('click',()=>{const n=ov.querySelector('#km-n').value.trim(),k=ov.querySelector('#km-k').value.trim();if(n.length<2){ov.querySelector('#km-n').focus();ov.querySelector('#km-n').style.borderColor='#dc2626';return}if(!k){ov.querySelector('#km-k').focus();return}
+   try{localStorage.setItem('km-nimi',n)}catch(e){}
+   const body='Teema: '+teema+'\nLink: '+location.href.split('#')[0]+'#'+ankur+'\nNimi: '+(n||'-')+'\n\n'+k;
+   location.href='mailto:'+TO+'?subject='+encodeURIComponent(PRE+teema)+'&body='+encodeURIComponent(body);ov.hidden=true;ov.querySelector('#km-k').value=''});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&ov&&!ov.hidden)ov.hidden=true})}
+ function ava(h){if(!ov)build();teema=puhas(h);const s=h.closest('[id]');ankur=h.id||(s&&s.id)||'';ov.querySelector('.km-t').textContent=teema;
+  try{ov.querySelector('#km-n').value=localStorage.getItem('km-nimi')||''}catch(e){}ov.hidden=false;setTimeout(()=>ov.querySelector('#km-k').focus(),30)}
+ function nupud(){document.querySelectorAll('h2').forEach(h=>{if(h.querySelector('.km-btn')||h.closest('.km-ov,.et-zov,nav,.et-kast,.et-lab'))return;
+  const b=document.createElement('button');b.type='button';b.className='km-btn';b.textContent='💬 Kommenteeri';b.setAttribute('aria-label','Kommenteeri teemat');
+  b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();ava(h)});h.append(b)})}
+ let t;new MutationObserver(()=>{clearTimeout(t);t=setTimeout(nupud,150)}).observe(document.documentElement,{childList:true,subtree:true});
+ if(document.readyState!=='loading')nupud();else document.addEventListener('DOMContentLoaded',nupud);
+})();
+</script>
